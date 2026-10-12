@@ -9,14 +9,17 @@ import AboutUsPage from './components/AboutUsPage';
 import MortgageCalculatorModal from './components/MortgageCalculatorModal';
 import WishlistDrawer from './components/WishlistDrawer';
 import ToastContainer from './components/Toast';
+import AgentDashboardApp from './agent-dashboard/App';
 
 import { PROPERTIES, CITIES } from './data/propertiesData';
 import { sound } from './utils/sound';
 import { ArrowUpDown, Building2, Sparkles } from 'lucide-react';
 
 export default function App() {
-  // Navigation Page: 'explore' | 'maintenance' | 'about'
-  const [currentPage, setCurrentPage] = useState('explore');
+  // Navigation Page: 'agent-dashboard' | 'explore' | 'maintenance' | 'about'
+  const [currentPage, setCurrentPage] = useState(() => {
+    return localStorage.getItem('habitat_active_view') || 'agent-dashboard';
+  });
 
   // Properties State (Rooms & Houses to Rent / Buy)
   const [properties, setProperties] = useState(() => {
@@ -97,6 +100,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('apartments_mode_v2', mode);
   }, [mode]);
+
+  useEffect(() => {
+    localStorage.setItem('habitat_active_view', currentPage);
+  }, [currentPage]);
 
   useEffect(() => {
     if (affordabilityProfile) {
@@ -226,6 +233,15 @@ export default function App() {
       max: affordabilityProfile?.maxBudget || maxBudget
     };
   }, [affordabilityProfile, minBudget, maxBudget]);
+
+  if (currentPage === 'agent-dashboard') {
+    return (
+      <div className="agent-dashboard-root min-h-screen">
+        <ToastContainer toasts={toasts} />
+        <AgentDashboardApp onSwitchToTenantView={() => setCurrentPage('explore')} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white text-slate-900 flex flex-col selection:bg-slate-900 selection:text-white">
