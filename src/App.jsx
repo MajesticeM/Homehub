@@ -3,33 +3,25 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import PropertyCard from './components/PropertyCard';
 import PropertyDetailModal from './components/PropertyDetailModal';
-import InteractiveMap from './components/InteractiveMap';
+import SellerChatModal from './components/SellerChatModal';
+import MaintenanceHub from './components/MaintenanceHub';
+import AboutUsPage from './components/AboutUsPage';
 import MortgageCalculatorModal from './components/MortgageCalculatorModal';
 import WishlistDrawer from './components/WishlistDrawer';
 import ToastContainer from './components/Toast';
-import AboutUsPage from './components/AboutUsPage';
-
-import MaintenanceHub from './components/MaintenanceHub';
-import ProviderProfileModal from './components/ProviderProfileModal';
-import ProviderQuoteChatModal from './components/ProviderQuoteChatModal';
-import SellerChatModal from './components/SellerChatModal';
-import MobileBottomNav from './components/MobileBottomNav';
-import MyMessagesModal from './components/MyMessagesModal';
-import AffordabilityAdvisorModal from './components/AffordabilityAdvisorModal';
 
 import { PROPERTIES, CITIES } from './data/propertiesData';
-import { SERVICE_PROVIDERS } from './data/maintenanceProvidersData';
 import { sound } from './utils/sound';
-import { ChevronLeft, ChevronRight, LayoutGrid, Map, Wrench } from 'lucide-react';
+import { ArrowUpDown, Building2, Sparkles } from 'lucide-react';
 
 export default function App() {
   // Navigation Page: 'explore' | 'maintenance' | 'about'
   const [currentPage, setCurrentPage] = useState('explore');
 
-  // Properties State (Localized for Tembisa & Midrand)
+  // Properties State (Rooms & Houses to Rent / Buy)
   const [properties, setProperties] = useState(() => {
     try {
-      const saved = localStorage.getItem('apartments_properties_sa_v1');
+      const saved = localStorage.getItem('apartments_properties_sa_v2');
       return saved ? JSON.parse(saved) : PROPERTIES;
     } catch {
       return PROPERTIES;
@@ -38,48 +30,45 @@ export default function App() {
 
   const [favorites, setFavorites] = useState(() => {
     try {
-      const saved = localStorage.getItem('apartments_favorites_sa_v1');
-      return saved ? JSON.parse(saved) : ['p1', 'p2', 'p3'];
+      const saved = localStorage.getItem('apartments_favorites_sa_v2');
+      return saved ? JSON.parse(saved) : ['p2', 'p5', 'p1'];
     } catch {
-      return ['p1', 'p2', 'p3'];
+      return ['p2', 'p5', 'p1'];
     }
   });
 
+  // Discovery Mode: 'rent' | 'buy' (defaults to 'rent' as requested)
   const [mode, setMode] = useState(() => {
-    return localStorage.getItem('apartments_mode') || 'buy'; // 'buy' | 'rent'
+    return localStorage.getItem('apartments_mode_v2') || 'rent';
   });
 
   // Filter State
   const [searchLocation, setSearchLocation] = useState('Tembisa');
-  const [activeCityIndex, setActiveCityIndex] = useState(0);
   const [nearMeOnly, setNearMeOnly] = useState(false);
-  
-  // Affordability & Personalized Budget Profile
-  const [affordabilityProfile, setAffordabilityProfile] = useState(() => {
-    try {
-      const saved = localStorage.getItem('apartments_affordability_profile_v1');
-      return saved ? JSON.parse(saved) : { income: 15000, expenses: 7000, minBudget: 2000, maxBudget: 7500, target: 5000, active: true };
-    } catch {
-      return { income: 15000, expenses: 7000, minBudget: 2000, maxBudget: 7500, target: 5000, active: true };
-    }
-  });
-
-  const [minBudget, setMinBudget] = useState(mode === 'buy' ? 500000 : (affordabilityProfile?.active ? affordabilityProfile.minBudget : 2000));
-  const [maxBudget, setMaxBudget] = useState(mode === 'buy' ? 2500000 : (affordabilityProfile?.active ? affordabilityProfile.maxBudget : 7500));
   const [selectedType, setSelectedType] = useState('All Types');
   const [minBeds, setMinBeds] = useState(0);
   const [sortBy, setSortBy] = useState('featured');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'map'
+
+  // Personalized Budget & Affordability Profile
+  const [affordabilityProfile, setAffordabilityProfile] = useState(() => {
+    try {
+      const saved = localStorage.getItem('apartments_affordability_profile_v2');
+      return saved
+        ? JSON.parse(saved)
+        : { income: 15000, expenses: 7000, minBudget: 2200, maxBudget: 6500, target: 4500, active: true };
+    } catch {
+      return { income: 15000, expenses: 7000, minBudget: 2200, maxBudget: 6500, target: 4500, active: true };
+    }
+  });
+
+  const [minBudget, setMinBudget] = useState(mode === 'buy' ? 500000 : 2000);
+  const [maxBudget, setMaxBudget] = useState(mode === 'buy' ? 2500000 : 7500);
 
   // Modals & Chat Overlays
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [chatProperty, setChatProperty] = useState(null); // When user chats with seller
-  const [selectedProvider, setSelectedProvider] = useState(null); // When viewing provider profile
-  const [quoteProvider, setQuoteProvider] = useState(null); // When requesting quote & chatting provider
+  const [chatProperty, setChatProperty] = useState(null);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isMortgageModalOpen, setIsMortgageModalOpen] = useState(false);
-  const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
-  const [isAffordabilityModalOpen, setIsAffordabilityModalOpen] = useState(false);
   const [soundMuted, setSoundMuted] = useState(false);
 
   // Toast System
@@ -98,18 +87,22 @@ export default function App() {
   };
 
   useEffect(() => {
-    localStorage.setItem('apartments_properties_sa_v1', JSON.stringify(properties));
+    localStorage.setItem('apartments_properties_sa_v2', JSON.stringify(properties));
   }, [properties]);
 
   useEffect(() => {
-    localStorage.setItem('apartments_favorites_sa_v1', JSON.stringify(favorites));
+    localStorage.setItem('apartments_favorites_sa_v2', JSON.stringify(favorites));
   }, [favorites]);
 
   useEffect(() => {
-    localStorage.setItem('apartments_mode', mode);
-    setMinBudget(mode === 'buy' ? 500000 : 2000);
-    setMaxBudget(mode === 'buy' ? 2500000 : 7500);
+    localStorage.setItem('apartments_mode_v2', mode);
   }, [mode]);
+
+  useEffect(() => {
+    if (affordabilityProfile) {
+      localStorage.setItem('apartments_affordability_profile_v2', JSON.stringify(affordabilityProfile));
+    }
+  }, [affordabilityProfile]);
 
   const handleToggleFavorite = (propId) => {
     setFavorites((prev) => {
@@ -120,54 +113,81 @@ export default function App() {
         return prev.filter((id) => id !== propId);
       } else {
         sound.play('success');
-        addToast('Added to saved homes wishlist! ❤️', 'success');
+        addToast('Added to saved wishlist! ❤️', 'success');
         return [...prev, propId];
       }
     });
   };
 
-  const handlePrevCity = () => {
-    const nextIdx = activeCityIndex === 0 ? CITIES.length - 1 : activeCityIndex - 1;
-    setActiveCityIndex(nextIdx);
-    setSearchLocation(CITIES[nextIdx]);
-    sound.play('click');
-  };
+  // Add review to a property's responsible agent
+  const handleAddAgentReview = (propertyId, newReview) => {
+    setProperties((prev) =>
+      prev.map((p) => {
+        if (p.id !== propertyId) return p;
+        const currentReviews = p.agent.reviews || [];
+        const updatedReviews = [newReview, ...currentReviews];
+        const newAvg = (
+          updatedReviews.reduce((sum, r) => sum + r.rating, 0) / updatedReviews.length
+        ).toFixed(2);
+        return {
+          ...p,
+          agent: {
+            ...p.agent,
+            reviews: updatedReviews,
+            reviewsCount: updatedReviews.length,
+            rating: parseFloat(newAvg)
+          }
+        };
+      })
+    );
 
-  const handleNextCity = () => {
-    const nextIdx = (activeCityIndex + 1) % CITIES.length;
-    setActiveCityIndex(nextIdx);
-    setSearchLocation(CITIES[nextIdx]);
-    sound.play('click');
+    setSelectedProperty((prev) => {
+      if (!prev || prev.id !== propertyId) return prev;
+      const currentReviews = prev.agent.reviews || [];
+      const updatedReviews = [newReview, ...currentReviews];
+      const newAvg = (
+        updatedReviews.reduce((sum, r) => sum + r.rating, 0) / updatedReviews.length
+      ).toFixed(2);
+      return {
+        ...prev,
+        agent: {
+          ...prev.agent,
+          reviews: updatedReviews,
+          reviewsCount: updatedReviews.length,
+          rating: parseFloat(newAvg)
+        }
+      };
+    });
   };
 
   // Filtered Properties
   const filteredProperties = useMemo(() => {
     return properties
       .filter((p) => {
+        // Location Match (matches city, neighborhood, address, title, or landmarks)
         if (searchLocation && searchLocation.trim() !== '') {
           const terms = searchLocation
             .toLowerCase()
             .split(',')
             .map((s) => s.trim())
             .filter((s) => s.length > 0 && s !== 'gauteng' && s !== 'south africa');
-          
+
           const primaryTerm = terms[0] || searchLocation.toLowerCase().trim();
-          
+
           const matchLoc =
             terms.some((term) =>
               p.location.toLowerCase().includes(term) ||
               p.neighborhood.toLowerCase().includes(term) ||
               p.address.toLowerCase().includes(term) ||
               p.title.toLowerCase().includes(term) ||
-              p.description.toLowerCase().includes(term) ||
+              (p.proximity?.mall && p.proximity.mall.toLowerCase().includes(term)) ||
+              (p.proximity?.taxiRank && p.proximity.taxiRank.toLowerCase().includes(term)) ||
               (p.landmarks && p.landmarks.some((l) => l.toLowerCase().includes(term)))
             ) ||
             p.location.toLowerCase().includes(primaryTerm) ||
             p.neighborhood.toLowerCase().includes(primaryTerm) ||
             p.address.toLowerCase().includes(primaryTerm) ||
-            p.title.toLowerCase().includes(primaryTerm) ||
-            p.description.toLowerCase().includes(primaryTerm) ||
-            (p.landmarks && p.landmarks.some((l) => l.toLowerCase().includes(primaryTerm)));
+            p.title.toLowerCase().includes(primaryTerm);
 
           if (!matchLoc) return false;
         }
@@ -196,12 +216,16 @@ export default function App() {
 
         if (sortBy === 'price-low') return priceA - priceB;
         if (sortBy === 'price-high') return priceB - priceA;
-        if (sortBy === 'distance') return a.distanceKm - b.distanceKm;
         return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
       });
   }, [properties, mode, searchLocation, nearMeOnly, minBudget, maxBudget, selectedType, minBeds, sortBy]);
 
-  const currentCityName = searchLocation ? searchLocation.split(',')[0] : 'All Cities';
+  const recommendedBudgetRange = useMemo(() => {
+    return {
+      min: affordabilityProfile?.minBudget || minBudget,
+      max: affordabilityProfile?.maxBudget || maxBudget
+    };
+  }, [affordabilityProfile, minBudget, maxBudget]);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 flex flex-col selection:bg-slate-900 selection:text-white">
@@ -219,14 +243,14 @@ export default function App() {
         addToast={addToast}
       />
 
-      {/* Main Pages Content */}
-      <main className="flex-1 w-full space-y-10 pb-28 md:pb-16">
+      {/* Main Content Area */}
+      <main className="flex-1 w-full pb-20">
         
         {/* PAGE 1: HOME MAINTENANCE SERVICES & QUOTES */}
         {currentPage === 'maintenance' && (
           <MaintenanceHub
-            onSelectProvider={(provider) => setSelectedProvider(provider)}
-            onOpenQuoteChat={(provider) => setQuoteProvider(provider)}
+            onSelectProvider={() => {}}
+            onOpenQuoteChat={() => {}}
             addToast={addToast}
           />
         )}
@@ -238,10 +262,11 @@ export default function App() {
           />
         )}
 
-        {/* PAGE 3: MAIN EXPLORE & DISCOVERY (Houses / Rooms to Buy or Rent) */}
+        {/* PAGE 3: MAIN DISCOVERY (Exact Hero Look & Feel Requested) */}
         {currentPage === 'explore' && (
-          <>
-            {/* Hero Section */}
+          <div className="space-y-8">
+            
+            {/* The Exact Look & Feel Hero Component */}
             <HeroSection
               mode={mode}
               setMode={setMode}
@@ -261,7 +286,7 @@ export default function App() {
                 const el = document.getElementById('explore-section');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              onOpenAffordabilityModal={() => setIsAffordabilityModalOpen(true)}
+              onOpenAffordabilityModal={() => setIsMortgageModalOpen(true)}
               onOpenMortgageModal={() => setIsMortgageModalOpen(true)}
               setCurrentPage={setCurrentPage}
               addToast={addToast}
@@ -270,175 +295,122 @@ export default function App() {
               filteredCount={filteredProperties.length}
             />
 
-            {/* Explore Section */}
+            {/* Properties List Section */}
             <section id="explore-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
               
-              <div className="flex items-center justify-between">
+              {/* Header Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div>
-                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-                    {affordabilityProfile?.active ? 'Homes that fit your budget ✨' : `Explore ${currentCityName}`}
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                    <span>
+                      {searchLocation ? `Properties in ${searchLocation}` : 'Available Homes & Rooms'}
+                    </span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold">
+                      {filteredProperties.length} {mode === 'buy' ? 'For Sale' : 'To Rent'}
+                    </span>
                   </h2>
-                  <p className="text-slate-600 text-xs sm:text-sm mt-1 font-medium">
-                    {affordabilityProfile?.active ? (
-                      mode === 'buy'
-                        ? `Based on your estimated purchase budget of R${(affordabilityProfile.minBudget / 1000).toFixed(0)}k – R${(affordabilityProfile.maxBudget / 1000).toFixed(0)}k (${filteredProperties.length} homes found)`
-                        : `Based on your estimated rent range of R${affordabilityProfile.minBudget.toLocaleString()} – R${affordabilityProfile.maxBudget.toLocaleString()}/mo (${filteredProperties.length} homes & rooms found)`
-                    ) : (
-                      `Showing ${filteredProperties.length} ${mode === 'buy' ? 'homes for sale' : 'properties & rooms for rent'}`
-                    )}
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+                    Click any property to see the assigned agent, proximity to malls & taxi ranks, and start a chat or WhatsApp.
                   </p>
                 </div>
 
-                {/* City Carousel Buttons */}
-                <div className="flex items-center gap-2">
-                  <div className="p-1 rounded-full bg-slate-100 border border-slate-200 flex mr-2">
-                    <button
-                      onClick={() => { setViewMode('grid'); sound.play('click'); }}
-                      className={`p-2 rounded-full transition ${viewMode === 'grid' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
-                      title="Grid View"
-                    >
-                      <LayoutGrid className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => { setViewMode('map'); sound.play('click'); }}
-                      className={`p-2 rounded-full transition ${viewMode === 'map' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
-                      title="Interactive Map"
-                    >
-                      <Map className="w-4 h-4" />
-                    </button>
-                  </div>
+                {/* Sort selector */}
+                <div className="flex items-center gap-1.5 self-start sm:self-center">
+                  <span className="text-xs font-bold text-slate-400 mr-1 flex items-center gap-1">
+                    <ArrowUpDown className="w-3.5 h-3.5" />
+                    Sort:
+                  </span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => {
+                      setSortBy(e.target.value);
+                      sound.play('click');
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 shadow-2xs cursor-pointer focus:outline-hidden"
+                  >
+                    <option value="featured">Featured First</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Personalized Affordability Advice Callout Banner */}
-              {affordabilityProfile?.active && (
-                <div className="p-4 sm:p-5 rounded-3xl hero-gradient border border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm animate-fade-in">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-white text-slate-900 border border-slate-200 flex items-center justify-center text-base shrink-0 shadow-2xs">
-                      💡
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                        <span>Comfortable Budget Active</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
-                          Personalized
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-600 mt-0.5">
-                        We recommend staying around{' '}
-                        <strong className="text-slate-950 font-bold">
-                          {mode === 'buy'
-                            ? `R${(affordabilityProfile.minBudget / 1000).toFixed(0)}k`
-                            : `R${affordabilityProfile.target.toLocaleString()}/mo`}
-                        </strong>
-                        , so you have room for your other monthly expenses.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                    <button
-                      onClick={() => setIsAffordabilityModalOpen(true)}
-                      className="px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold transition shadow-2xs"
-                    >
-                      Edit Budget
-                    </button>
-                    <button
-                      onClick={() => {
-                        setAffordabilityProfile({ ...affordabilityProfile, active: false });
-                        setMinBudget(0);
-                        setMaxBudget(mode === 'buy' ? 4000000 : 15000);
-                        sound.play('click');
-                        addToast('Showing all properties without budget constraints', 'info');
-                      }}
-                      className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium transition"
-                    >
-                      View All
-                    </button>
-                  </div>
+              {/* Properties Grid */}
+              {filteredProperties.length === 0 ? (
+                <div className="text-center py-20 bg-slate-50 rounded-3xl p-8 space-y-3 border border-slate-200">
+                  <Building2 className="w-10 h-10 text-slate-400 mx-auto" />
+                  <h3 className="text-base font-bold text-slate-900">
+                    No properties found matching this criteria
+                  </h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    Try adjusting your location or expanding your budget range.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchLocation('Tembisa');
+                      setSelectedType('All Types');
+                      setMinBudget(0);
+                      setMaxBudget(mode === 'buy' ? 4000000 : 20000);
+                      sound.play('click');
+                    }}
+                    className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold"
+                  >
+                    Reset Filters & View All
+                  </button>
                 </div>
-              )}
-
-              {/* View Mode: Map vs Grid */}
-              {viewMode === 'map' ? (
-                <InteractiveMap
-                  properties={filteredProperties}
-                  mode={mode}
-                  onSelectProperty={(prop) => setSelectedProperty(prop)}
-                />
               ) : (
-                <div>
-                  {filteredProperties.length === 0 ? (
-                    <div className="text-center py-20 bg-slate-50 rounded-3xl p-8 space-y-4 border border-slate-200">
-                      <div className="text-4xl">🏡</div>
-                      <h3 className="text-lg font-bold text-slate-900">No properties found matching this budget in {currentCityName}</h3>
-                      <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        Try expanding your comfortable budget range or switch between Tembisa and Midrand areas.
-                      </p>
-                      <button
-                        onClick={() => {
-                          setMinBudget(0);
-                          setMaxBudget(mode === 'buy' ? 4000000 : 15000);
-                          setAffordabilityProfile({ ...affordabilityProfile, active: false });
-                          sound.play('click');
-                        }}
-                        className="px-5 py-2.5 rounded-full bg-slate-900 text-white text-xs font-semibold shadow"
-                      >
-                        View All Tembisa & Midrand Properties
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filteredProperties.map((property) => (
-                        <PropertyCard
-                          key={property.id}
-                          property={property}
-                          mode={mode}
-                          isFavorite={favorites.includes(property.id)}
-                          onToggleFavorite={handleToggleFavorite}
-                          onSelectProperty={(prop) => setSelectedProperty(prop)}
-                          onChatSeller={(prop) => setChatProperty(prop)}
-                          affordabilityProfile={affordabilityProfile}
-                        />
-                      ))}
-                    </div>
-                  )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProperties.map((property) => (
+                    <PropertyCard
+                      key={property.id}
+                      property={property}
+                      isFavorite={favorites.includes(property.id)}
+                      onToggleFavorite={handleToggleFavorite}
+                      onSelectProperty={(prop) => setSelectedProperty(prop)}
+                      onChatAgent={(prop) => setChatProperty(prop)}
+                      recommendedBudget={recommendedBudgetRange}
+                    />
+                  ))}
                 </div>
               )}
 
             </section>
-          </>
+
+          </div>
         )}
 
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-100 bg-slate-50/50 py-10 mt-12">
+      <footer className="border-t border-slate-100 bg-slate-50/50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-800">Apartments</span>
             <span>•</span>
-            <span>Discover Homes, Rooms & Verified Maintenance Pros in Tembisa & Midrand</span>
+            <span>Discover Homes, Rooms & Verified Hosts in Tembisa & Midrand</span>
           </div>
-          <div>All listings and verified service providers active. Offline ready.</div>
-          <div>© 2026 Apartments Co. (Tembisa & Midrand). All rights reserved.</div>
+          <div>Proximity to Malls & Taxi Ranks, In-App Chat & WhatsApp Direct</div>
+          <div>© 2026 Apartments Co. All rights reserved.</div>
         </div>
       </footer>
 
-      {/* 1. Property Details Modal */}
+      {/* MODAL 1: FULL PROPERTY DETAILS & RESPONSIBLE AGENT WITH WHATSAPP/CHAT */}
       {selectedProperty && (
         <PropertyDetailModal
           property={selectedProperty}
-          mode={mode}
+          allProperties={properties}
           isFavorite={favorites.includes(selectedProperty.id)}
           onToggleFavorite={handleToggleFavorite}
-          onOpenChatSeller={(prop) => setChatProperty(prop)}
+          onOpenChatAgent={(prop) => setChatProperty(prop)}
+          onSelectOtherProperty={(prop) => setSelectedProperty(prop)}
           onClose={() => setSelectedProperty(null)}
+          onAddAgentReview={handleAddAgentReview}
           addToast={addToast}
         />
       )}
 
-      {/* 2. Direct Chat with Property Seller Modal */}
+      {/* MODAL 2: IN-APP LIVE CHAT WITH RESPONSIBLE AGENT */}
       {chatProperty && (
         <SellerChatModal
           property={chatProperty}
@@ -447,81 +419,29 @@ export default function App() {
         />
       )}
 
-      {/* 3. Service Provider Profile & Portfolio Modal */}
-      {selectedProvider && (
-        <ProviderProfileModal
-          provider={selectedProvider}
-          onClose={() => setSelectedProvider(null)}
-          onOpenQuoteChat={(prov) => setQuoteProvider(prov)}
-          addToast={addToast}
+      {/* MODAL 3: MORTGAGE / BOND & AFFORDABILITY CALCULATOR */}
+      {isMortgageModalOpen && (
+        <MortgageCalculatorModal
+          isOpen={isMortgageModalOpen}
+          onClose={() => setIsMortgageModalOpen(false)}
+          defaultPrice={1200000}
         />
       )}
 
-      {/* 4. Service Provider Issue Description, Photo Upload & Quote Chat */}
-      {quoteProvider && (
-        <ProviderQuoteChatModal
-          provider={quoteProvider}
-          onClose={() => setQuoteProvider(null)}
-          addToast={addToast}
-        />
-      )}
-
-      {/* 5. Saved Wishlist Drawer */}
+      {/* MODAL 4: WISHLIST DRAWER */}
       <WishlistDrawer
         isOpen={isWishlistOpen}
         onClose={() => setIsWishlistOpen(false)}
         favorites={favorites}
         properties={properties}
         mode={mode}
-        onRemoveFavorite={handleToggleFavorite}
-        onSelectProperty={(prop) => setSelectedProperty(prop)}
-        onClearAll={() => {
-          setFavorites([]);
-          sound.play('click');
-          addToast('Cleared all saved wishlist properties', 'info');
+        onToggleFavorite={handleToggleFavorite}
+        onSelectProperty={(prop) => {
+          setIsWishlistOpen(false);
+          setSelectedProperty(prop);
         }}
-        addToast={addToast}
       />
 
-      {/* 6. Standalone Mortgage Calculator Modal */}
-      {isMortgageModalOpen && (
-        <MortgageCalculatorModal onClose={() => setIsMortgageModalOpen(false)} />
-      )}
-
-      {/* 7. Central Messages & Active Inquiries Hub Modal */}
-      {isMessagesModalOpen && (
-        <MyMessagesModal
-          onClose={() => setIsMessagesModalOpen(false)}
-          onOpenSellerChat={(prop) => setChatProperty(prop)}
-          onOpenProviderChat={(prov) => setQuoteProvider(prov)}
-          properties={properties}
-          providers={SERVICE_PROVIDERS}
-        />
-      )}
-
-      {/* 8. Interactive Comfortable Budget / Affordability Advisor Modal */}
-      <AffordabilityAdvisorModal
-        isOpen={isAffordabilityModalOpen}
-        onClose={() => setIsAffordabilityModalOpen(false)}
-        mode={mode}
-        onApplyBudget={(profile) => {
-          setAffordabilityProfile(profile);
-          setMinBudget(profile.minBudget);
-          setMaxBudget(profile.maxBudget);
-          localStorage.setItem('apartments_affordability_profile_v1', JSON.stringify(profile));
-        }}
-        addToast={addToast}
-      />
-
-      {/* Sticky Mobile Bottom Navigation Bar */}
-      <MobileBottomNav
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        favoritesCount={favorites.length}
-        onOpenWishlist={() => setIsWishlistOpen(true)}
-        onOpenMessages={() => setIsMessagesModalOpen(true)}
-        unreadMessagesCount={2}
-      />
     </div>
   );
 }

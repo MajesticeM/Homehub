@@ -61,7 +61,7 @@ export default function Navbar({
             }`}
           >
             <Building2 className="w-4 h-4" />
-            <span>Find Homes & Rooms</span>
+            <span>Find by Agents</span>
           </button>
 
           <button
