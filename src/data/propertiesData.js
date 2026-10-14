@@ -179,8 +179,8 @@ export const PROPERTIES = [
   {
     id: 'p3',
     title: 'Luxury 2-Bed Polofields Waterfall Apartment near PwC Tower',
-    type: 'House',
-    category: 'house',
+    type: 'Apartment',
+    category: 'apartment',
     mode: 'rent',
     price: 2150000,
     priceMonthly: 14500,
@@ -261,8 +261,8 @@ export const PROPERTIES = [
   {
     id: 'p4',
     title: 'Modern Executive 1-Bedroom Loft in Carlswald near PwC & N1',
-    type: 'House',
-    category: 'house',
+    type: 'Apartment',
+    category: 'apartment',
     mode: 'rent',
     price: 890000,
     priceMonthly: 7500,
@@ -586,8 +586,8 @@ export const PROPERTIES = [
     category: 'house',
     mode: 'rent',
     price: 650000,
-    priceMonthly: 4600,
-    deposit: 4600,
+    priceMonthly: 3950,
+    deposit: 3950,
     location: 'Tembisa, Gauteng',
     address: '88 Kwartel Road, Birch Acres Border, Tembisa, 1630',
     neighborhood: 'Birch Acres',
@@ -731,8 +731,165 @@ export const PROPERTIES = [
         }
       ]
     },
-    hoa: 0,
-    propertyTaxRate: 1.0
+  },
+
+  // 10. TEMBISA - Clayville East 2-Bedroom Security Apartment
+  {
+    id: 'p10',
+    title: 'Modern 2-Bedroom Security Complex Apartment in Clayville East',
+    type: 'Apartment',
+    category: 'apartment',
+    mode: 'rent',
+    price: 680000,
+    priceMonthly: 4100,
+    deposit: 4100,
+    location: 'Tembisa, Gauteng',
+    address: '12 Aloe Ridge Way, Clayville East, Tembisa, 1666',
+    neighborhood: 'Clayville East',
+    coordinates: { lat: -25.9835, lng: 28.2295 },
+    distanceKm: 1.4,
+    beds: 2,
+    baths: 1,
+    sqft: 62,
+    yearBuilt: 2022,
+    garage: 1,
+    parking: 1,
+    availableFrom: 'Immediately',
+    prepaidElectricity: true,
+    petFriendly: true,
+    images: [
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80'
+    ],
+    featured: true,
+    virtualTour: true,
+    verified: true,
+    proximity: {
+      mall: 'Clayville Shopping Centre (800m) & Tembisa Mall (4.0 km)',
+      taxiRank: 'Clayville Rank & Midrand Taxi Links (3 mins walk)',
+      hospital: 'Clayville Clinic (600m)',
+      workOrSchool: 'Midrand Corporate Parks via Olifantsfontein (10 mins)'
+    },
+    landmarks: [
+      'Clayville Shopping Centre (800m)',
+      'Olifantsfontein Commercial Park (8 mins)',
+      'Midrand Corporate Corridors (10 mins)'
+    ],
+    amenities: [
+      '24/7 Guardhouse & Fingerprint Access',
+      'Covered Carport + Ample Visitor Parking',
+      'Built-in Bedroom Wardrobes in Both Rooms',
+      'Separate Prepaid Electricity & Water Meter',
+      'High-Speed Fibre WiFi Ready'
+    ],
+    description:
+      'Immaculate 2-bedroom apartment in a secure, family-friendly estate in Clayville East, Tembisa. Features full bathroom, contemporary fitted kitchen with stove & oven, sunny lounge with sliding door, and 24-hour guarded gate with biometric access.',
+    agent: {
+      name: 'Kagiso Mthethwa',
+      agency: 'Real Estate Services (Tembisa & Clayville)',
+      agencyOrigin: 'Based at Clayville Shopping Centre, Tembisa',
+      agencyHighlight: '7+ years local track record with 250+ verified rentals in Tembisa and Clayville',
+      role: 'Clayville Area Property Manager',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80',
+      phone: '+27 82 459 1082',
+      whatsapp: '+27824591082',
+      email: 'kagiso.m@propertyhub.co.za',
+      rating: 4.95,
+      reviewsCount: 42,
+      responseTime: 'Replies in < 15 mins',
+      bio: 'Senior property consultant for Clayville and Olifantsfontein. Meets tenants on-site for immediate viewings.',
+      reviews: [
+        {
+          id: 'r-k4',
+          author: 'Mpho Dlamini',
+          rating: 5,
+          date: '3 days ago',
+          comment: 'Very quiet and secure complex. Fibre was already active when I moved in.'
+        }
+      ]
+    },
+    hoa: 450,
+    propertyTaxRate: 1.1
+  },
+
+  // 11. MIDRAND - Carlswald 2-Bedroom Townhouse
+  {
+    id: 'p11',
+    title: 'Modern 2-Bedroom Garden Townhouse near Carlswald & San Ridge',
+    type: 'Townhouse',
+    category: 'townhouse',
+    mode: 'rent',
+    price: 1350000,
+    priceMonthly: 8900,
+    deposit: 8900,
+    location: 'Midrand, Gauteng',
+    address: '45 Springfield Road, Carlswald, Midrand, 1684',
+    neighborhood: 'Carlswald',
+    coordinates: { lat: -25.9865, lng: 28.1215 },
+    distanceKm: 1.8,
+    beds: 2,
+    baths: 2,
+    sqft: 95,
+    yearBuilt: 2021,
+    garage: 1,
+    parking: 2,
+    availableFrom: 'Immediately',
+    prepaidElectricity: true,
+    petFriendly: true,
+    images: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80'
+    ],
+    featured: true,
+    virtualTour: true,
+    verified: true,
+    proximity: {
+      mall: 'Carlswald Lifestyle Shopping (1.2 km) & San Ridge Square',
+      taxiRank: 'New Road Minibus Route (2 mins) & Gautrain Bus Stop',
+      hospital: 'Mediclinic Midrand (3.0 km)',
+      workOrSchool: 'PwC Tower Waterfall (6 mins) & Vodacom Campus (4 km)'
+    },
+    landmarks: [
+      'Carlswald Lifestyle Shopping (1.2 km)',
+      'PwC Tower Waterfall (6 mins)',
+      'San Ridge Square (1.4 km)'
+    ],
+    amenities: [
+      'Private Pet-Friendly Garden',
+      'Swimming Pool & Clubhouse in Complex',
+      '2 Full Bathrooms (Main En-Suite)',
+      'Covered Carport + Garage',
+      '24/7 Security Patrols'
+    ],
+    description:
+      'Spacious 2-bedroom, 2-bathroom duplex townhouse in Carlswald, Midrand. Short 6-minute drive to PwC Tower and Mall of Africa. Features private walled garden, granite kitchen, and pool in complex.',
+    agent: {
+      name: 'Lerato Sithole',
+      agency: 'Carlswald Living Rentals',
+      agencyOrigin: 'Based at Carlswald Lifestyle Centre, Midrand',
+      agencyHighlight: 'Executive lofts, garden cottages and family houses in Carlswald, Noordwyk & Crowthorne',
+      role: 'Carlswald Area Specialist',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+      phone: '+27 71 654 2210',
+      whatsapp: '+27716542210',
+      email: 'lerato@carlswaldliving.co.za',
+      rating: 4.88,
+      reviewsCount: 29,
+      responseTime: 'Replies in < 10 mins',
+      bio: 'Manages top-tier rental units across Carlswald and Halfway Gardens.',
+      reviews: [
+        {
+          id: 'r-l2',
+          author: 'Siphiwe Zulu',
+          rating: 5,
+          date: '5 days ago',
+          comment: 'Outstanding townhouse in Carlswald. Garden is perfect for small pets.'
+        }
+      ]
+    },
+    hoa: 980,
+    propertyTaxRate: 1.1
   }
 ];
 

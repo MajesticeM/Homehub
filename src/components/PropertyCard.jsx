@@ -5,13 +5,10 @@ import {
   Bath,
   Car,
   MapPin,
-  CheckCircle2,
   Sparkles,
-  MessageSquare,
   Zap,
   ShoppingBag,
-  Bus,
-  Star
+  Bus
 } from 'lucide-react';
 import { sound } from '../utils/sound';
 
@@ -20,7 +17,6 @@ export default function PropertyCard({
   isFavorite,
   onToggleFavorite,
   onSelectProperty,
-  onChatAgent,
   recommendedBudget
 }) {
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
@@ -138,7 +134,7 @@ export default function PropertyCard({
         </div>
 
         {/* Specs: Beds, Baths, Parking */}
-        <div className="flex items-center justify-between text-xs text-slate-600 pt-0.5 px-1 font-semibold">
+        <div className="flex items-center justify-between text-xs text-slate-600 pt-1 px-1 font-semibold border-t border-slate-100">
           <span className="flex items-center gap-1">
             <BedDouble className="w-3.5 h-3.5 text-slate-400" />
             <strong>{property.beds}</strong> {property.beds === 1 ? 'Bed' : 'Beds'}
@@ -153,63 +149,6 @@ export default function PropertyCard({
             <Car className="w-3.5 h-3.5 text-slate-400" />
             <strong>{property.parking || property.garage || 1}</strong> Bay
           </span>
-        </div>
-
-        {/* Responsible Agent & Direct Communication Strip */}
-        <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-          
-          {/* Agent info */}
-          <div className="flex items-center gap-2 min-w-0">
-            <img
-              src={property.agent.avatar}
-              alt={property.agent.name}
-              className="w-8 h-8 rounded-full object-cover border border-emerald-400 shadow-2xs shrink-0"
-            />
-            <div className="min-w-0">
-              <span className="font-bold text-slate-900 text-xs truncate block">
-                {property.agent.name}
-              </span>
-              <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                <Star className="w-3 h-3 fill-amber-400 text-amber-400 shrink-0" />
-                <span className="font-bold text-slate-700">{property.agent.rating}</span>
-                <span>({property.agent.reviewsCount || 30})</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Contact Buttons (In-App Chat & WhatsApp) */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                sound.play('click');
-                onChatAgent(property);
-              }}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1 transition shadow-2xs"
-              title="Chat in App"
-            >
-              <MessageSquare className="w-3.5 h-3.5" />
-              <span>Chat</span>
-            </button>
-
-            <a
-              href={`https://wa.me/${property.agent.whatsapp ? property.agent.whatsapp.replace('+', '') : '27738914420'}?text=${encodeURIComponent(
-                `Hello ${property.agent.name}, I am interested in renting '${property.title}' (R${property.priceMonthly}/mo) in ${property.neighborhood}. Is it available?`
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => {
-                e.stopPropagation();
-                sound.play('click');
-              }}
-              className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 transition shadow-2xs"
-              title="WhatsApp Agent"
-            >
-              <span>WA</span>
-            </a>
-          </div>
-
         </div>
 
       </div>
