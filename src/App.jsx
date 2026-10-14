@@ -9,7 +9,9 @@ import AboutUsPage from './components/AboutUsPage';
 import MortgageCalculatorModal from './components/MortgageCalculatorModal';
 import WishlistDrawer from './components/WishlistDrawer';
 import ToastContainer from './components/Toast';
+import AgentAuthPage from './components/AgentAuthPage';
 import AgentDashboardApp from './agent-dashboard/App';
+import { getActiveAgent, loginAgent, logoutAgent, registerAgent } from './utils/agentAuth';
 
 import { PROPERTIES, CITIES } from './data/propertiesData';
 import { sound } from './utils/sound';
@@ -18,8 +20,9 @@ import { ArrowUpDown, Building2, Sparkles } from 'lucide-react';
 export default function App() {
   // Navigation Page: 'agent-dashboard' | 'explore' | 'maintenance' | 'about'
   const [currentPage, setCurrentPage] = useState(() => {
-    return localStorage.getItem('habitat_active_view') || 'agent-dashboard';
+    return localStorage.getItem('habitat_active_view') || 'explore';
   });
+  const [agentProfile, setAgentProfile] = useState(() => getActiveAgent());
 
   // Properties State (Rooms & Houses to Rent / Buy)
   const [properties, setProperties] = useState(() => {
@@ -106,6 +109,18 @@ export default function App() {
   }, [currentPage]);
 
   useEffect(() => {
+    if (!agentProfile && currentPage === 'agent-dashboard') {
+      setCurrentPage('agent-auth');
+    }
+  }, [agentProfile, currentPage]);
+
+  useEffect(() => {
+    if (agentProfile && currentPage === 'agent-auth') {
+      setCurrentPage('agent-dashboard');
+    }
+  }, [agentProfile, currentPage]);
+
+  useEffect(() => {
     if (affordabilityProfile) {
       localStorage.setItem('apartments_affordability_profile_v2', JSON.stringify(affordabilityProfile));
     }
@@ -124,6 +139,30 @@ export default function App() {
         return [...prev, propId];
       }
     });
+  };
+
+  const handleAgentLogin = ({ email, password }) => {
+    const result = loginAgent({ email, password });
+    if (result.ok) {
+      setAgentProfile(result.agent);
+      setCurrentPage('agent-dashboard');
+    }
+    return result;
+  };
+
+  const handleAgentRegister = (payload) => {
+    const result = registerAgent(payload);
+    if (result.ok) {
+      setAgentProfile(result.agent);
+      setCurrentPage('agent-dashboard');
+    }
+    return result;
+  };
+
+  const handleAgentLogout = () => {
+    logoutAgent();
+    setAgentProfile(null);
+    setCurrentPage('explore');
   };
 
   // Add review to a property's responsible agent
@@ -234,11 +273,27 @@ export default function App() {
     };
   }, [affordabilityProfile, minBudget, maxBudget]);
 
+  if (currentPage === 'agent-auth') {
+    return (
+      <div className="min-h-screen">
+        <AgentAuthPage
+          onBack={() => setCurrentPage('explore')}
+          onLogin={handleAgentLogin}
+          onRegister={handleAgentRegister}
+        />
+      </div>
+    );
+  }
+
   if (currentPage === 'agent-dashboard') {
     return (
       <div className="agent-dashboard-root min-h-screen">
         <ToastContainer toasts={toasts} />
-        <AgentDashboardApp onSwitchToTenantView={() => setCurrentPage('explore')} />
+        <AgentDashboardApp
+          currentAgent={agentProfile || getActiveAgent() || undefined}
+          onSwitchToTenantView={() => setCurrentPage('explore')}
+          onLogout={handleAgentLogout}
+        />
       </div>
     );
   }

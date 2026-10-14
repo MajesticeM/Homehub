@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './index.css';
+import { savePropertyToSupabase, isSupabaseConfigured } from '../lib/supabase';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Modal from './components/Modal';
@@ -29,9 +30,9 @@ import {
   initialNotifications
 } from './data/mockData';
 
-export default function App({ onSwitchToTenantView }) {
+export default function App({ onSwitchToTenantView, currentAgent = initialAgent, onLogout }) {
   const [activePage, setActivePage] = useState('overview');
-  const [agent, setAgent] = useState(initialAgent);
+  const [agent, setAgent] = useState(currentAgent || initialAgent);
   const [properties, setProperties] = useState(initialProperties);
   const [leads, setLeads] = useState(initialLeads);
   const [appointments, setAppointments] = useState(initialAppointments);
@@ -58,6 +59,10 @@ export default function App({ onSwitchToTenantView }) {
     notes: 'Booked via Quick Action'
   });
 
+  useEffect(() => {
+    setAgent(currentAgent || initialAgent);
+  }, [currentAgent]);
+
   // Navigation helper
   const navigateTo = (pageId) => {
     setActivePage(pageId);
@@ -65,7 +70,23 @@ export default function App({ onSwitchToTenantView }) {
   };
 
   // Property Handlers
-  const handleSaveProperty = (propertyData) => {
+  const handleSaveProperty = async (propertyData) => {
+    try {
+      if (isSupabaseConfigured) {
+        const result = await savePropertyToSupabase(propertyData);
+        if (result.ok) {
+          console.info('Property saved to Supabase:', result.data);
+        } else {
+          console.warn('Supabase save was skipped or misconfigured:', result.reason);
+        }
+      } else {
+        console.warn('Supabase is not configured. Saving locally only. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable remote persistence.');
+      }
+    } catch (error) {
+      console.error('Unable to save property to Supabase:', error);
+      alert('The property was saved locally, but the remote database save failed. Check your Supabase connection settings.');
+    }
+
     if (editingProperty) {
       setProperties((prev) =>
         prev.map((p) => (p.id === propertyData.id ? propertyData : p))
@@ -278,6 +299,7 @@ export default function App({ onSwitchToTenantView }) {
           onNavigate={navigateTo}
           onToggleMobileMenu={() => setMobileMenuOpen(true)}
           onSwitchToTenantView={onSwitchToTenantView}
+          onLogout={onLogout}
         />
 
         <main className="page-content">

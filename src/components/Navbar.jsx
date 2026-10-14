@@ -99,7 +99,7 @@ export default function Navbar({
 
           <button
             onClick={() => {
-              setCurrentPage('agent-dashboard');
+              setCurrentPage('agent-auth');
               sound.play('click');
             }}
             className="transition flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 shadow-sm"
@@ -157,7 +157,7 @@ export default function Navbar({
         <div className="md:hidden border-t border-slate-100 p-4 space-y-3 bg-white">
           <button
             onClick={() => {
-              setCurrentPage('agent-dashboard');
+              setCurrentPage('agent-auth');
               setIsMenuOpen(false);
             }}
             className="w-full text-left py-2 font-bold text-emerald-800 flex items-center gap-2 bg-emerald-50 px-3 rounded-xl border border-emerald-200"
