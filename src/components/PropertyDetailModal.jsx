@@ -10,10 +10,8 @@ import {
   Zap,
   ShoppingBag,
   Bus,
-  Clock,
   Phone,
   MessageSquare,
-  ShieldCheck,
   Calendar,
   Sparkles,
   Star,
@@ -26,6 +24,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { sound } from '../utils/sound';
+import RentalApplicationModal from './RentalApplicationModal';
 
 export default function PropertyDetailModal({
   property,
@@ -36,12 +35,15 @@ export default function PropertyDetailModal({
   onSelectOtherProperty,
   onClose,
   onAddAgentReview,
+  onApplyProperty,
+  affordabilityProfile,
   addToast
 }) {
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
   const [viewingDate, setViewingDate] = useState('Tomorrow');
   const [viewingTime, setViewingTime] = useState('14:00 PM');
   const [viewingConfirmed, setViewingConfirmed] = useState(false);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
   // Review Form for this agent
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -414,6 +416,35 @@ export default function PropertyDetailModal({
               </div>
             </div>
 
+            {/* Direct Online Application Banner */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg border border-slate-700">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-bold border border-emerald-500/30">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Direct Agent Application</span>
+                </div>
+                <h4 className="text-base font-extrabold text-white">
+                  Ready to apply for this {property.type}?
+                </h4>
+                <p className="text-xs text-slate-300">
+                  Submit your details directly to {agent.name.split(' ')[0]}'s dashboard pipeline for fast FICA approval.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  sound.play('click');
+                  setIsApplyModalOpen(true);
+                }}
+                className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition active:scale-95 shrink-0 cursor-pointer"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Apply for this Property</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
           </div>
 
           {/* ============================================================== */}
@@ -732,6 +763,22 @@ export default function PropertyDetailModal({
         </div>
 
       </div>
+
+      {/* RENTAL APPLICATION MODAL */}
+      <RentalApplicationModal
+        isOpen={isApplyModalOpen}
+        onClose={() => setIsApplyModalOpen(false)}
+        property={property}
+        defaultIncome={affordabilityProfile?.income}
+        defaultExpenses={affordabilityProfile?.expenses}
+        onSubmitApplication={(app, prop) => {
+          if (onApplyProperty) {
+            onApplyProperty(app, prop);
+          }
+        }}
+        addToast={addToast}
+      />
+
     </div>
   );
 }

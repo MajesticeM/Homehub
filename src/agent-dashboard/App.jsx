@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import './index.css';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
@@ -29,14 +29,91 @@ import {
   initialNotifications
 } from './data/mockData';
 
-export default function App({ onSwitchToTenantView }) {
+export default function App({
+  onSwitchToTenantView,
+  externalApplications,
+  onUpdateExternalApplications
+}) {
   const [activePage, setActivePage] = useState('overview');
   const [agent, setAgent] = useState(initialAgent);
   const [properties, setProperties] = useState(initialProperties);
-  const [leads, setLeads] = useState(initialLeads);
+  const [leads, setLeads] = useState(() => {
+    try {
+      const saved = localStorage.getItem('habitat_leads_sa_v1');
+      return saved ? JSON.parse(saved) : initialLeads;
+    } catch {
+      return initialLeads;
+    }
+  });
   const [appointments, setAppointments] = useState(initialAppointments);
-  const [applications, setApplications] = useState(initialApplications);
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [applications, setApplications] = useState(() => {
+    if (externalApplications && externalApplications.length > 0) return externalApplications;
+    try {
+      const saved = localStorage.getItem('habitat_applications_sa_v1');
+      return saved ? JSON.parse(saved) : initialApplications;
+    } catch {
+      return initialApplications;
+    }
+  });
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('habitat_notifications_sa_v1');
+      return saved ? JSON.parse(saved) : initialNotifications;
+    } catch {
+      return initialNotifications;
+    }
+  });
+
+  // Sync to shared storage so changes reflect across customer portal & agent dashboard
+  useEffect(() => {
+    localStorage.setItem('habitat_applications_sa_v1', JSON.stringify(applications));
+    if (onUpdateExternalApplications) {
+      onUpdateExternalApplications(applications);
+    }
+  }, [applications, onUpdateExternalApplications]);
+
+  useEffect(() => {
+    localStorage.setItem('habitat_leads_sa_v1', JSON.stringify(leads));
+  }, [leads]);
+
+  useEffect(() => {
+    localStorage.setItem('habitat_notifications_sa_v1', JSON.stringify(notifications));
+  }, [notifications]);
+
+  // Listen to storage events and application submissions in real time
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'habitat_applications_sa_v1' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setApplications(parsed);
+        } catch (_err) {}
+      }
+      if (e.key === 'habitat_leads_sa_v1' && e.newValue) {
+        try {
+          setLeads(JSON.parse(e.newValue));
+        } catch (_err) {}
+      }
+      if (e.key === 'habitat_notifications_sa_v1' && e.newValue) {
+        try {
+          setNotifications(JSON.parse(e.newValue));
+        } catch (_err) {}
+      }
+    };
+
+    const handleCustomAppSubmit = (e) => {
+      if (e.detail) {
+        setApplications((prev) => [e.detail, ...prev.filter((a) => a.id !== e.detail.id)]);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('habitat_application_submitted', handleCustomAppSubmit);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('habitat_application_submitted', handleCustomAppSubmit);
+    };
+  }, []);
 
   // Selected item states
   const [selectedProperty, setSelectedProperty] = useState(null);
