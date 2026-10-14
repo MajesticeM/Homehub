@@ -13,7 +13,8 @@ export default function Header({
   onSelectNotification,
   onNavigate,
   onToggleMobileMenu,
-  onSwitchToTenantView
+  onSwitchToTenantView,
+  onLogout
 }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -192,7 +193,7 @@ export default function Header({
                   style={{ padding: '8px 16px', width: '100%', color: 'var(--color-danger)' }}
                   onClick={() => {
                     setShowUserDropdown(false);
-                    alert('Session demo: In production this will clear authentication token.');
+                    if (onLogout) onLogout();
                   }}
                 >
                   <LogOut size={16} /> Log Out

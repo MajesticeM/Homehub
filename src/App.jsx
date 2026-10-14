@@ -11,6 +11,7 @@ import HousingAdvicePage from './components/HousingAdvicePage';
 // import MortgageCalculatorModal from './components/MortgageCalculatorModal';
 import WishlistDrawer from './components/WishlistDrawer';
 import ToastContainer from './components/Toast';
+import AgentAuthPage from './components/AgentAuthPage';
 import AgentDashboardApp from './agent-dashboard/App';
 import QuickFilterBar from './components/QuickFilterBar';
 import AdvancedFiltersModal from './components/AdvancedFiltersModal';
@@ -71,6 +72,7 @@ export default function App() {
       return initialApplications;
     }
   });
+  const [agentProfile, setAgentProfile] = useState(() => getActiveAgent());
 
   // Properties State (Rooms & Houses to Rent / Buy)
   const [properties, setProperties] = useState(() => {
@@ -167,6 +169,18 @@ export default function App() {
   }, [currentPage]);
 
   useEffect(() => {
+    if (!agentProfile && currentPage === 'agent-dashboard') {
+      setCurrentPage('agent-auth');
+    }
+  }, [agentProfile, currentPage]);
+
+  useEffect(() => {
+    if (agentProfile && currentPage === 'agent-auth') {
+      setCurrentPage('agent-dashboard');
+    }
+  }, [agentProfile, currentPage]);
+
+  useEffect(() => {
     if (affordabilityProfile) {
       localStorage.setItem('apartments_affordability_profile_v2', JSON.stringify(affordabilityProfile));
     }
@@ -185,6 +199,30 @@ export default function App() {
         return [...prev, propId];
       }
     });
+  };
+
+  const handleAgentLogin = ({ email, password }) => {
+    const result = loginAgent({ email, password });
+    if (result.ok) {
+      setAgentProfile(result.agent);
+      setCurrentPage('agent-dashboard');
+    }
+    return result;
+  };
+
+  const handleAgentRegister = (payload) => {
+    const result = registerAgent(payload);
+    if (result.ok) {
+      setAgentProfile(result.agent);
+      setCurrentPage('agent-dashboard');
+    }
+    return result;
+  };
+
+  const handleAgentLogout = () => {
+    logoutAgent();
+    setAgentProfile(null);
+    setCurrentPage('explore');
   };
 
   // Add review to a property's responsible agent
@@ -543,6 +581,18 @@ export default function App() {
       max: affordabilityProfile?.maxBudget || maxBudget
     };
   }, [affordabilityProfile, minBudget, maxBudget]);
+
+  if (currentPage === 'agent-auth') {
+    return (
+      <div className="min-h-screen">
+        <AgentAuthPage
+          onBack={() => setCurrentPage('explore')}
+          onLogin={handleAgentLogin}
+          onRegister={handleAgentRegister}
+        />
+      </div>
+    );
+  }
 
   if (currentPage === 'agent-dashboard') {
     return (

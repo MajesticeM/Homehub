@@ -92,6 +92,25 @@ export default function Navbar({
           >
             About us
           </button>
+
+          <button
+            onClick={onOpenMortgageModal}
+            className="hover:text-slate-950 transition flex items-center gap-1.5 text-slate-600"
+          >
+            <Calculator className="w-4 h-4" />
+            <span>Calculator</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setCurrentPage('agent-auth');
+              sound.play('click');
+            }}
+            className="transition flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 shadow-sm"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Agent Dashboard</span>
+          </button>
         </nav>
 
         {/* Right Actions */}
@@ -217,6 +236,16 @@ export default function Navbar({
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden border-t border-slate-100 p-4 space-y-3 bg-white">
+          <button
+            onClick={() => {
+              setCurrentPage('agent-auth');
+              setIsMenuOpen(false);
+            }}
+            className="w-full text-left py-2 font-bold text-emerald-800 flex items-center gap-2 bg-emerald-50 px-3 rounded-xl border border-emerald-200"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Agent Dashboard (SA Portal)
+          </button>
           <button
             onClick={() => {
               setCurrentPage('explore');
